@@ -1,6 +1,6 @@
 {
   "name": "cowmand",
-  "version": "0.0.2-beta.0",
+  "version": "0.0.3-beta.0",
   "description": "Helper to create a cli api",
   "main": "dist/cowmand.js",
   "typings": "dist/cowmand.d.ts",

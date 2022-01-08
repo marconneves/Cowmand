@@ -1,5 +1,5 @@
 ![TheMath](https://i.imgur.com/dWPzX9W.png)
-# _🐮 Cowmand
+# _🐮 Cowmand - _IN DEVELOPMENT_
 
 ## Introduction
 This lib get beginning of express to create a cli. It's a simple way to create a cli.
