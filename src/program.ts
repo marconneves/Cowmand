@@ -90,16 +90,16 @@ program.parseArguments = function parseArguments(args: string[]) {
           }
         } else if (accumulator.flagPending) {
           this.params.flags.push([accumulator.flagName, true]);
-        } else if (arg.startsWith('--')) {
+        }
+
+        if (arg.startsWith('--')) {
           const [key, value] = arg.split('=');
 
           this.params.flags.push([key, value || true]);
         } else if (arg.startsWith('-')) {
-          const [key] = arg.split('=');
-
           return {
             flagPending: true,
-            flagName: key
+            flagName: arg
           };
         }
 
