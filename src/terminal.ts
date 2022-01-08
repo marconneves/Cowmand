@@ -1,0 +1,59 @@
+import chalk from 'chalk';
+import ora from 'ora';
+
+interface Terminal {
+  log(...args: unknown[]): Terminal;
+  error(title: string, lines: string[]): Terminal;
+  table(...args: unknown[]): Terminal;
+
+  loading(text: string): {
+    changeText(textChange: string): void;
+    stop(): void;
+    changeColor(color: ora.Color): void;
+    succeed(textSuccess: string): void;
+  };
+
+  end(): void;
+}
+
+const terminal: Terminal = {
+  log(...args: unknown[]) {
+    console.log(...args);
+    return this;
+  },
+  error(title: string, lines: string[]) {
+    const space = ' '.repeat(title.length);
+
+    console.log(chalk.red.bold(title), chalk.red(lines.join(`\n ${space}`)));
+    return this;
+  },
+  table(...args: unknown[]) {
+    console.table(...args);
+    return this;
+  },
+  loading(text: string) {
+    const spinner = ora({
+      text: `${text}`
+    }).start();
+
+    return {
+      changeColor(color: ora.Color) {
+        spinner.color = color;
+      },
+      changeText(textChange: string) {
+        spinner.text = textChange;
+      },
+      stop() {
+        spinner.stop();
+      },
+      succeed(textSuccess: string) {
+        spinner.succeed(textSuccess);
+      }
+    };
+  },
+  end() {
+    process.exit(0);
+  }
+};
+
+export { terminal, Terminal };

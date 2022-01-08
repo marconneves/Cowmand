@@ -1,0 +1,11 @@
+src/*
+test/*
+
+.editorconfig
+.eslintignore
+.eslintrc.json
+prettier.config.js
+jest.config.js
+
+tsconfig.js
+environment.d.ts
