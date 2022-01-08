@@ -22,7 +22,7 @@ export type UseFunction = (
   nextFunction: NextFunction
 ) => void;
 
-interface Program {
+export interface Program {
   session: { [key: string]: unknown };
   params: Params;
   stack: UseFunction[];
