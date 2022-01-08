@@ -3,7 +3,7 @@ import { terminal as terminalObject, Terminal } from './terminal';
 export interface Params {
   command: string;
   subCommands: string[];
-  flags: [string, string | number | boolean][];
+  flags: Map<string, string | number | boolean>;
 }
 
 export interface Context {
@@ -28,6 +28,7 @@ export interface Program {
   stack: UseFunction[];
 
   parseArguments(args: string[]): void;
+  lazyStack(promises: Promise<unknown>[]): Generator<unknown, void, unknown>;
 
   init(): void;
 
@@ -45,7 +46,7 @@ program.init = function init() {
   this.params = {
     command: '/',
     subCommands: [] as string[],
-    flags: [] as [string, string | number | boolean][]
+    flags: new Map<string, string | number | boolean>()
   };
   this.stack = [] as UseFunction[];
 
@@ -54,24 +55,27 @@ program.init = function init() {
   return program;
 };
 
-program.start = function start() {
-  // Start the program
-  this.stack.forEach(execution =>
+/**
+ * TODO: The stack is wrong, need refactor after.ß
+ */
+
+program.start = async function start() {
+  // eslint-disable-next-line no-restricted-syntax
+  for await (const execution of this.stack) {
     execution(
       { session: this.session, params: this.params },
       terminalObject,
       () => console.log('next')
-    )
-  );
+    );
+  }
 };
 
-program.use = function use(fn, fns) {
+program.use = function use(fn, ...fns) {
   if (typeof fn !== 'function') {
-    console.log(fns);
-    this.stack.push(fns);
+    fns.forEach(f => this.stack.push(f));
   } else {
     this.stack.push(fn);
-    this.stack.push(fns);
+    fns.forEach(f => this.stack.push(f));
   }
 };
 
@@ -86,16 +90,16 @@ program.parseArguments = function parseArguments(args: string[]) {
           if (!accumulator.flagPending) {
             this.params.subCommands.push(arg);
           } else {
-            this.params.flags.push([accumulator.flagName, arg]);
+            this.params.flags.set(accumulator.flagName, arg);
           }
         } else if (accumulator.flagPending) {
-          this.params.flags.push([accumulator.flagName, true]);
+          this.params.flags.set(accumulator.flagName, true);
         }
 
         if (arg.startsWith('--')) {
           const [key, value] = arg.split('=');
 
-          this.params.flags.push([key, value || true]);
+          this.params.flags.set(key, value || true);
         } else if (arg.startsWith('-')) {
           return {
             flagPending: true,
@@ -121,7 +125,7 @@ program.parseArguments = function parseArguments(args: string[]) {
   );
 
   if (hasPendingFlag.flagPending) {
-    this.params.flags.push([hasPendingFlag.flagName, true]);
+    this.params.flags.set(hasPendingFlag.flagName, true);
   }
 };
 

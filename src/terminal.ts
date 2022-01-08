@@ -11,6 +11,7 @@ interface Terminal {
     stop(): void;
     changeColor(color: ora.Color): void;
     succeed(textSuccess: string): void;
+    fail(textFail: string): void;
   };
 
   end(): void;
@@ -48,6 +49,9 @@ const terminal: Terminal = {
       },
       succeed(textSuccess: string) {
         spinner.succeed(textSuccess);
+      },
+      fail(textFail: string) {
+        spinner.fail(textFail);
       }
     };
   },
