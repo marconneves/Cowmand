@@ -5,7 +5,7 @@ import { MeController } from './meController';
 
 const program = Cowmand();
 
-program.use(['login'], GuardLogin);
+program.use({ notIn: ['login'] }, GuardLogin);
 
 program.use('login', LoginController);
 
@@ -14,7 +14,6 @@ program.use('me', MeController);
 // console.log(program.stack);
 
 program.start();
-
 // Example of stack
 // const commands = {
 //   handle(req, res, next) {
