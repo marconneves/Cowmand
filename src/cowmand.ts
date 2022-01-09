@@ -8,7 +8,7 @@ function createProgram() {
   return program;
 }
 
-export { Context, NextFunction } from './program';
+export { Context, NextFunction } from './Commands/Layer';
 export { Terminal } from './terminal';
 
 export { createProgram };

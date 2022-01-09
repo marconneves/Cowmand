@@ -1,42 +1,22 @@
-import { terminal as terminalObject, Terminal } from './terminal';
-
-export interface Params {
-  command: string;
-  subCommands: string[];
-  flags: Map<string, string | number | boolean>;
-}
-
-export interface Context {
-  params: Params;
-  session: { [key: string]: unknown };
-}
-
-export type NextFunctionError = (error?: Error) => void;
-export type NextFunctionSuccess = () => void;
-
-export type NextFunction = NextFunctionSuccess | NextFunctionError;
-
-export type UseFunction = (
-  context: Context,
-  terminal: Terminal,
-  nextFunction: NextFunction
-) => void;
+import { terminal as terminalObject } from './terminal';
+import { Layer, CommandFunction, Params } from './Commands/Layer';
 
 export interface Program {
   session: { [key: string]: unknown };
   params: Params;
-  stack: UseFunction[];
+  stack: Layer[];
 
   parseArguments(args: string[]): void;
-  lazyStack(promises: Promise<unknown>[]): Generator<unknown, void, unknown>;
+  lazyStack(promises: Promise<unknown>[]): Generator<unknown, void>;
 
   init(): void;
 
   start(): void;
 
-  use(...fn: UseFunction[]): void;
-  use(command: string, ...fn: UseFunction[]): void;
-  use(commands: string[], ...fn: UseFunction[]): void;
+  use(...fn: CommandFunction[]): void;
+  use(command: string, ...fn: CommandFunction[]): void;
+  use(notInCommands: string[], ...fn: CommandFunction[]): void;
+  use(command: string, notInCommands: string[], ...fn: CommandFunction[]): void;
 }
 
 const program = { params: {} } as Program;
@@ -48,7 +28,7 @@ program.init = function init() {
     subCommands: [] as string[],
     flags: new Map<string, string | number | boolean>()
   };
-  this.stack = [] as UseFunction[];
+  this.stack = [] as Layer[];
 
   this.parseArguments(process.argv);
 
@@ -62,7 +42,10 @@ program.init = function init() {
 program.start = async function start() {
   // eslint-disable-next-line no-restricted-syntax
   for await (const execution of this.stack) {
-    execution(
+    if (!execution.match(this.params.command)) {
+      continue;
+    }
+    execution.handle(
       { session: this.session, params: this.params },
       terminalObject,
       () => console.log('next')
@@ -70,12 +53,30 @@ program.start = async function start() {
   }
 };
 
-program.use = function use(fn, ...fns) {
-  if (typeof fn !== 'function') {
-    fns.forEach(f => this.stack.push(f));
-  } else {
-    this.stack.push(fn);
-    fns.forEach(f => this.stack.push(f));
+program.use = function use(firstArgument, secondArgument) {
+  let offset = 0;
+  let command = '';
+  let notInCommands = [];
+
+  if (typeof firstArgument === 'string' && typeof secondArgument === 'object') {
+    command = firstArgument;
+    notInCommands = secondArgument;
+    offset = 2;
+  } else if (typeof firstArgument === 'string') {
+    command = firstArgument;
+    offset = 1;
+  } else if (typeof firstArgument === 'object') {
+    notInCommands = firstArgument;
+    offset = 1;
+  }
+
+  const callbacks = (
+    Object.values(arguments) as unknown as CommandFunction[]
+  ).slice(offset);
+
+  for (let i = 0; i < callbacks.length; i++) {
+    const callback = callbacks[i];
+    this.stack.push(new Layer(command, notInCommands, {}, callback));
   }
 };
 
