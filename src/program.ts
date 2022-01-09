@@ -1,77 +1,100 @@
-import { terminal as terminalObject, Terminal } from './terminal';
+import Debug from 'debug';
 
-export interface Params {
-  command: string;
-  subCommands: string[];
-  flags: [string, string | number | boolean][];
-}
+import { terminal as terminalObject } from './terminal';
+import { Layer, CommandFunction, Params } from './Commands/Layer';
 
-export interface Context {
-  params: Params;
-  session: { [key: string]: unknown };
-}
-
-export type NextFunctionError = (error?: Error) => void;
-export type NextFunctionSuccess = () => void;
-
-export type NextFunction = NextFunctionSuccess | NextFunctionError;
-
-export type UseFunction = (
-  context: Context,
-  terminal: Terminal,
-  nextFunction: NextFunction
-) => void;
+const debug = Debug('cowmand:program');
 
 export interface Program {
   session: { [key: string]: unknown };
   params: Params;
-  stack: UseFunction[];
+  stack: Layer[];
 
   parseArguments(args: string[]): void;
+  lazyStack(promises: Promise<unknown>[]): Generator<unknown, void>;
 
   init(): void;
 
   start(): void;
+  start(callback: () => void): void;
 
-  use(...fn: UseFunction[]): void;
-  use(command: string, ...fn: UseFunction[]): void;
-  use(commands: string[], ...fn: UseFunction[]): void;
+  use(...fn: CommandFunction[]): void;
+  use(command: string, ...fn: CommandFunction[]): void;
+  use(commands: string[], ...fn: CommandFunction[]): void;
+  use(command: { notIn: string[] }, ...fn: CommandFunction[]): void;
 }
 
 const program = { params: {} } as Program;
 
 program.init = function init() {
+  debug('init program');
+
   this.session = {};
   this.params = {
     command: '/',
     subCommands: [] as string[],
-    flags: [] as [string, string | number | boolean][]
+    flags: new Map<string, string | number | boolean>()
   };
-  this.stack = [] as UseFunction[];
+  this.stack = [] as Layer[];
 
   this.parseArguments(process.argv);
 
   return program;
 };
 
-program.start = function start() {
-  // Start the program
-  this.stack.forEach(execution =>
-    execution(
+/**
+ * TODO: The stack is wrong, need refactor after.ß
+ */
+
+program.start = async function start(callback?: () => void) {
+  // eslint-disable-next-line no-restricted-syntax
+  for await (const execution of this.stack) {
+    if (!execution.match(this.params.command)) {
+      continue;
+    }
+    execution.handle(
       { session: this.session, params: this.params },
       terminalObject,
       () => console.log('next')
-    )
-  );
+    );
+  }
+
+  if (callback) callback();
 };
 
-program.use = function use(fn, fns) {
-  if (typeof fn !== 'function') {
-    console.log(fns);
-    this.stack.push(fns);
-  } else {
-    this.stack.push(fn);
-    this.stack.push(fns);
+program.use = function use(firstArgument) {
+  let offset = 0;
+  let command = '';
+  let subCommands = [] as string[];
+  let notInCommands = [] as string[];
+
+  if (typeof firstArgument !== 'function') {
+    offset = 1;
+
+    if (typeof firstArgument === 'string') {
+      command = firstArgument;
+    } else if (Array.isArray(firstArgument)) {
+      const [commands, ...rest] = firstArgument as string[];
+
+      command = commands;
+      subCommands = rest;
+    } else {
+      notInCommands = firstArgument.notIn;
+    }
+  }
+
+  const callbacks = (
+    Object.values(arguments) as unknown as CommandFunction[]
+  ).slice(offset);
+
+  for (let i = 0; i < callbacks.length; i++) {
+    const callback = callbacks[i];
+
+    debug("use middleware %s on '%s'", callback.name, command);
+
+    this.stack.push(
+      new Layer(command, { subCommands, notInCommands }, callback)
+    );
   }
 };
 
@@ -86,20 +109,20 @@ program.parseArguments = function parseArguments(args: string[]) {
           if (!accumulator.flagPending) {
             this.params.subCommands.push(arg);
           } else {
-            this.params.flags.push([accumulator.flagName, arg]);
+            this.params.flags.set(accumulator.flagName, arg);
           }
         } else if (accumulator.flagPending) {
-          this.params.flags.push([accumulator.flagName, true]);
-        } else if (arg.startsWith('--')) {
+          this.params.flags.set(accumulator.flagName, true);
+        }
+
+        if (arg.startsWith('--')) {
           const [key, value] = arg.split('=');
 
-          this.params.flags.push([key, value || true]);
+          this.params.flags.set(key, value || true);
         } else if (arg.startsWith('-')) {
-          const [key] = arg.split('=');
-
           return {
             flagPending: true,
-            flagName: key
+            flagName: arg
           };
         }
 
@@ -121,7 +144,7 @@ program.parseArguments = function parseArguments(args: string[]) {
   );
 
   if (hasPendingFlag.flagPending) {
-    this.params.flags.push([hasPendingFlag.flagName, true]);
+    this.params.flags.set(hasPendingFlag.flagName, true);
   }
 };
 

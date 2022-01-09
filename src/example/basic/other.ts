@@ -1,4 +1,4 @@
-import { Context, Terminal, NextFunction } from '../../src/cowmand';
+import { Context, Terminal, NextFunction } from '../../cowmand';
 
 const promise = () => {
   return new Promise(resolve => {

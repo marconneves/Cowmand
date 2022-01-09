@@ -1,10 +1,21 @@
 {
   "name": "cowmand",
-  "version": "0.0.3-beta.0",
-  "description": "Helper to create a cli api",
+  "version": "0.0.3",
+  "description": "Fast helper to create a cli",
+  "tags": [
+    "cli",
+    "command",
+    "args",
+    "argv",
+    "helper",
+    "command-line-interface"
+  ],
   "main": "dist/cowmand.js",
   "typings": "dist/cowmand.d.ts",
-  "repository": "https://github.com/MarconWillian/Cowmand",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MarconWillian/Cowmand"
+  },
   "author": "Marcon Willian <oi@marcon.run>",
   "license": "MIT",
   "publishConfig": {
@@ -20,10 +31,13 @@
   },
   "dependencies": {
     "chalk": "4.1.2",
-    "merge-descriptors": "^1.0.1",
+    "debug": "^4.3.3",
+    "jsonfile": "^6.1.0",
     "ora": "5.4.1"
   },
   "devDependencies": {
+    "@types/debug": "^4.1.7",
+    "@types/jsonfile": "^6.0.1",
     "@types/merge-descriptors": "^1.0.1",
     "@types/node": "^17.0.8",
     "@typescript-eslint/eslint-plugin": "^5.9.0",
