@@ -7,12 +7,17 @@ const GuardLogin = async (
   terminal: Terminal,
   next: NextFunction
 ) => {
-  const session = jsonFile.readFileSync(
-    path.resolve(__dirname, 'session.json'),
-    {
+  let session;
+
+  try {
+    session = jsonFile.readFileSync(path.resolve(__dirname, 'session.json'), {
       throws: false
-    }
-  );
+    });
+  } catch (error) {
+    console.log(error, 'other');
+  }
+
+  context.session.user = session?.user;
 
   if (session?.user || context.params.command === 'login') {
     terminal.table([
@@ -23,7 +28,12 @@ const GuardLogin = async (
     return next();
   }
 
-  return terminal.error('Error:', ['User not is logged.']).end();
+  return terminal
+    .error('Error:', [
+      'User not is logged.',
+      `Execute: script login --user=admin --password=admin`
+    ])
+    .end();
 };
 
 export { GuardLogin };
