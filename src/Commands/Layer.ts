@@ -1,12 +1,8 @@
+import Debug from 'debug';
 import { Terminal } from '../terminal';
 
-/**
- * Have Command
- * Have Handle Function
- * Have Not in Command List
- * Have math function of command
- * have a next function in handle Function
- */
+const debug = Debug('cowmand:layer');
+const debugMatch = Debug('cowmand:layer:match');
 
 export interface Params {
   command: string;
@@ -39,7 +35,8 @@ export type CommandErrorFunction = (
 ) => void;
 
 export interface OptionsLayer {
-  notImplemented?: true;
+  subCommands: string[];
+  notInCommands: string[];
 }
 
 export interface ILayer {
@@ -67,14 +64,16 @@ class Layer implements ILayer {
 
   constructor(
     command: string | undefined,
-    notInCommand: string[],
     options: OptionsLayer,
     executor: CommandFunction
   ) {
     this.handle = executor;
-    this.name = executor.name;
+
+    this.name = executor.name || 'anonymous';
     this.command = command || '';
-    this.notInCommand = notInCommand;
+    this.notInCommand = options.notInCommands || [];
+
+    debug('new %s:%s', this.name, command);
 
     this.baseMathSetting = { isRoot: command === '' };
   }
@@ -89,7 +88,7 @@ class Layer implements ILayer {
       );
 
       if (this.baseMathSetting.isRoot && !isNotInCommand) {
-        console.log('Match is Root: ', this.name);
+        debugMatch('match is root: %s', this.name);
         return true;
       }
 
@@ -97,12 +96,11 @@ class Layer implements ILayer {
     }
 
     if (!isCommand || isNotInCommand) {
-      console.log('Not Match: ', this.name);
+      debugMatch('not match: %s', this.name);
       return false;
     }
 
-    console.log('Match: ', this.name);
-
+    debugMatch('match: %s', this.name);
     return true;
   }
 }
