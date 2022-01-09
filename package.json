@@ -1,6 +1,6 @@
 {
   "name": "cowmand",
-  "version": "0.0.3-beta.1",
+  "version": "0.0.3",
   "description": "Fast helper to create a cli",
   "tags": [
     "cli",
@@ -13,8 +13,8 @@
   "main": "dist/cowmand.js",
   "typings": "dist/cowmand.d.ts",
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/MarconWillian/Cowmand"
+    "type": "git",
+    "url": "https://github.com/MarconWillian/Cowmand"
   },
   "author": "Marcon Willian <oi@marcon.run>",
   "license": "MIT",
@@ -33,7 +33,6 @@
     "chalk": "4.1.2",
     "debug": "^4.3.3",
     "jsonfile": "^6.1.0",
-    "merge-descriptors": "^1.0.1",
     "ora": "5.4.1"
   },
   "devDependencies": {
