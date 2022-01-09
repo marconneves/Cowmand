@@ -1,5 +1,9 @@
+import Debug from 'debug';
+
 import { terminal as terminalObject } from './terminal';
 import { Layer, CommandFunction, Params } from './Commands/Layer';
+
+const debug = Debug('cowmand:program');
 
 export interface Program {
   session: { [key: string]: unknown };
@@ -12,16 +16,19 @@ export interface Program {
   init(): void;
 
   start(): void;
+  start(callback: () => void): void;
 
   use(...fn: CommandFunction[]): void;
   use(command: string, ...fn: CommandFunction[]): void;
-  use(notInCommands: string[], ...fn: CommandFunction[]): void;
-  use(command: string, notInCommands: string[], ...fn: CommandFunction[]): void;
+  use(commands: string[], ...fn: CommandFunction[]): void;
+  use(command: { notIn: string[] }, ...fn: CommandFunction[]): void;
 }
 
 const program = { params: {} } as Program;
 
 program.init = function init() {
+  debug('init program');
+
   this.session = {};
   this.params = {
     command: '/',
@@ -39,7 +46,7 @@ program.init = function init() {
  * TODO: The stack is wrong, need refactor after.ß
  */
 
-program.start = async function start() {
+program.start = async function start(callback?: () => void) {
   // eslint-disable-next-line no-restricted-syntax
   for await (const execution of this.stack) {
     if (!execution.match(this.params.command)) {
@@ -51,23 +58,29 @@ program.start = async function start() {
       () => console.log('next')
     );
   }
+
+  if (callback) callback();
 };
 
-program.use = function use(firstArgument, secondArgument) {
+program.use = function use(firstArgument) {
   let offset = 0;
   let command = '';
-  let notInCommands = [];
+  let subCommands = [] as string[];
+  let notInCommands = [] as string[];
 
-  if (typeof firstArgument === 'string' && typeof secondArgument === 'object') {
-    command = firstArgument;
-    notInCommands = secondArgument;
-    offset = 2;
-  } else if (typeof firstArgument === 'string') {
-    command = firstArgument;
+  if (typeof firstArgument !== 'function') {
     offset = 1;
-  } else if (typeof firstArgument === 'object') {
-    notInCommands = firstArgument;
-    offset = 1;
+
+    if (typeof firstArgument === 'string') {
+      command = firstArgument;
+    } else if (Array.isArray(firstArgument)) {
+      const [commands, ...rest] = firstArgument as string[];
+
+      command = commands;
+      subCommands = rest;
+    } else {
+      notInCommands = firstArgument.notIn;
+    }
   }
 
   const callbacks = (
@@ -76,7 +89,12 @@ program.use = function use(firstArgument, secondArgument) {
 
   for (let i = 0; i < callbacks.length; i++) {
     const callback = callbacks[i];
-    this.stack.push(new Layer(command, notInCommands, {}, callback));
+
+    debug("use middleware %s on '%s'", callback.name, command);
+
+    this.stack.push(
+      new Layer(command, { subCommands, notInCommands }, callback)
+    );
   }
 };
 
