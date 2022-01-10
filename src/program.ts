@@ -52,7 +52,7 @@ program.start = async function start(callback?: () => void) {
     if (!execution.match(this.params.command)) {
       continue;
     }
-    execution.handle(
+    await execution.handle(
       { session: this.session, params: this.params },
       terminalObject,
       () => console.log('next')

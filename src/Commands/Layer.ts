@@ -25,7 +25,7 @@ export type CommandFunction = (
   context: Context,
   terminal: Terminal,
   nextFunction: NextFunction
-) => void;
+) => void | Promise<void>;
 
 export type CommandErrorFunction = (
   error: Error,
