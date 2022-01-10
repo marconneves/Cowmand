@@ -1,8 +1,24 @@
 ![TheMath](https://i.imgur.com/dWPzX9W.png)
-# _🐮 Cowmand - _IN DEVELOPMENT_
+# _🐮 Cowmand - _BETA_
 
 ## Introduction
 This lib get beginning of express to create a cli. It's a simple way to create a cli.
+
+
+## Installation
+
+This is a [Node.js](https://nodejs.org/en/) module available through the
+[npm registry](https://www.npmjs.com/package/cowmmand).
+
+Use npm:
+```
+$ npm install cowmmand
+```
+
+Use yarn:
+```
+$ yarn add cowmmand
+```
 
 ## Example Initial
 
@@ -50,8 +66,7 @@ program.start();
 
 
 ****
-Esse projeto está sob a licença MIT. Veja o arquivo [LICENSE][license-link] para mais detalhes.
+This project is under the MIT license. See the [LICENSE][license-link] file for more details.
 
-
-  <!-- Markdown link & img's -->
+<!-- Markdown link & img's -->
 [license-link]: /LICENSE
