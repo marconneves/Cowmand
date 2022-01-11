@@ -1,4 +1,4 @@
-![TheMath](https://i.imgur.com/dWPzX9W.png)
+![Cowmand][cowmand-logo]
 # _🐮 Cowmand - _BETA_
 
 ## Introduction
@@ -8,7 +8,7 @@ This lib get beginning of express to create a cli. It's a simple way to create a
 ## Installation
 
 This is a [Node.js](https://nodejs.org/en/) module available through the
-[npm registry](https://www.npmjs.com/package/cowmmand).
+[npm registry][cowmand-npm].
 
 Use npm:
 ```
@@ -70,3 +70,5 @@ This project is under the MIT license. See the [LICENSE][license-link] file for 
 
 <!-- Markdown link & img's -->
 [license-link]: /LICENSE
+[cowmand-logo]: https://i.imgur.com/dWPzX9W.png
+[cowmand-npm]: https://www.npmjs.com/package/cowmmand
