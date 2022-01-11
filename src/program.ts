@@ -46,18 +46,39 @@ program.init = function init() {
  * TODO: The stack is wrong, need refactor after.ß
  */
 
-program.start = async function start(callback?: () => void) {
-  // eslint-disable-next-line no-restricted-syntax
-  for await (const execution of this.stack) {
-    if (!execution.match(this.params.command)) {
-      continue;
+program.start = function start(callback?: () => void) {
+  let index = 0;
+
+  const next = (error?: Error) => {
+    if (error) console.log(error);
+
+    if (index >= this.stack.length) return;
+
+    let layerStack;
+    let match;
+
+    while (match !== true && index < this.stack.length) {
+      layerStack = this.stack[index];
+      match = layerStack.match(this.params.command);
+
+      index++;
+
+      if (!match) {
+        continue;
+      }
+
+      layerStack.handle(
+        { session: this.session, params: this.params },
+        terminalObject,
+        next
+      );
+      // TODO: Use Layers of error to validate when has a error.
+
+      return;
     }
-    await execution.handle(
-      { session: this.session, params: this.params },
-      terminalObject,
-      () => console.log('next')
-    );
-  }
+  };
+
+  next();
 
   if (callback) callback();
 };
