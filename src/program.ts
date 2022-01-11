@@ -1,7 +1,12 @@
 import Debug from 'debug';
 
 import { terminal as terminalObject } from './terminal';
-import { Layer, CommandFunction, Params } from './Commands/Layer';
+import {
+  Layer,
+  CommandFunction,
+  CommandErrorFunction,
+  Params
+} from './Commands/Layer';
 
 const debug = Debug('cowmand:program');
 
@@ -18,10 +23,16 @@ export interface Program {
   start(): void;
   start(callback: () => void): void;
 
-  use(...fn: CommandFunction[]): void;
-  use(command: string, ...fn: CommandFunction[]): void;
-  use(commands: string[], ...fn: CommandFunction[]): void;
-  use(command: { notIn: string[] }, ...fn: CommandFunction[]): void;
+  use(...fn: (CommandFunction | CommandErrorFunction)[]): void;
+  use(command: string, ...fn: (CommandFunction | CommandErrorFunction)[]): void;
+  use(
+    commands: string[],
+    ...fn: (CommandFunction | CommandErrorFunction)[]
+  ): void;
+  use(
+    command: { notIn: string[] },
+    ...fn: (CommandFunction | CommandErrorFunction)[]
+  ): void;
 }
 
 const program = { params: {} } as Program;
@@ -48,6 +59,7 @@ program.init = function init() {
 
 program.start = function start(callback?: () => void) {
   let index = 0;
+  if (callback) callback();
 
   const next = (error?: Error) => {
     if (error) console.log(error);
@@ -67,6 +79,19 @@ program.start = function start(callback?: () => void) {
         continue;
       }
 
+      if (error && !layerStack.handleError) {
+        continue;
+      }
+
+      if (error && layerStack.handleError) {
+        layerStack.handleError(
+          error,
+          { session: this.session, params: this.params },
+          terminalObject,
+          next
+        );
+      }
+
       layerStack.handle(
         { session: this.session, params: this.params },
         terminalObject,
@@ -79,13 +104,11 @@ program.start = function start(callback?: () => void) {
   };
 
   next();
-
-  if (callback) callback();
 };
 
 program.use = function use(firstArgument) {
   let offset = 0;
-  let command = '';
+  let command = '/';
   let subCommands = [] as string[];
   let notInCommands = [] as string[];
 
@@ -105,7 +128,10 @@ program.use = function use(firstArgument) {
   }
 
   const callbacks = (
-    Object.values(arguments) as unknown as CommandFunction[]
+    Object.values(arguments) as unknown as (
+      | CommandFunction
+      | CommandErrorFunction
+    )[]
   ).slice(offset);
 
   for (let i = 0; i < callbacks.length; i++) {
