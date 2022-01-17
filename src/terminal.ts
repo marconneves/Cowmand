@@ -1,3 +1,4 @@
+import { createInterface } from 'readline';
 import chalk from 'chalk';
 import ora from 'ora';
 
@@ -5,6 +6,8 @@ interface Terminal {
   log(...args: unknown[]): Terminal;
   error(title: string, lines: string[]): Terminal;
   table(...args: unknown[]): Terminal;
+
+  question(question: string): Promise<string>;
 
   loading(text: string): {
     changeText(textChange: string): void;
@@ -31,6 +34,19 @@ const terminal: Terminal = {
   table(...args: unknown[]) {
     console.table(...args);
     return this;
+  },
+  async question(question: string): Promise<string> {
+    return new Promise(resolve => {
+      const questionInterface = createInterface({
+        input: process.stdin,
+        output: process.stdout
+      });
+
+      questionInterface.question(question, answer => {
+        questionInterface.close();
+        resolve(answer);
+      });
+    });
   },
   loading(text: string) {
     const spinner = ora({

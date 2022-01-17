@@ -9,8 +9,15 @@ const delay = (ms: number) =>
   });
 
 const LoginController = async (context: Context, terminal: Terminal) => {
-  const user = context.params.flags.get('--user');
-  const password = context.params.flags.get('--password');
+  let user = context.params.flags.get('--user');
+  if(!user){
+    user = await terminal.question("Username: ")
+  }
+
+  let password = context.params.flags.get('--password');
+  if(!password){
+    password = await terminal.question("Password: ")
+  }
 
   const loading = terminal.loading('Logging in...');
   await delay(3000);
