@@ -31,7 +31,7 @@ export type CommandErrorFunction = (
   error: Error,
   context: Context,
   terminal: Terminal,
-  nextFunction: NextFunction
+  nextFunction: NextFunctionError
 ) => void;
 
 export interface OptionsLayer {
@@ -54,7 +54,9 @@ export interface ILayer {
 class Layer implements ILayer {
   private readonly name: string;
 
-  public handle: CommandFunction;
+  public handle?: CommandFunction;
+
+  public handleError?: CommandErrorFunction;
 
   private command: string;
 
@@ -65,17 +67,22 @@ class Layer implements ILayer {
   constructor(
     command: string | undefined,
     options: OptionsLayer,
-    executor: CommandFunction
+    executor: CommandFunction | CommandErrorFunction
   ) {
-    this.handle = executor;
+    if (executor.length <= 3) {
+      this.handle = executor as unknown as CommandFunction;
+    }
+    if (executor.length > 3) {
+      this.handleError = executor as unknown as CommandErrorFunction;
+    }
 
     this.name = executor.name || 'anonymous';
-    this.command = command || '';
+    this.command = command || '/';
     this.notInCommand = options.notInCommands || [];
 
     debug('new %s:%s', this.name, command);
 
-    this.baseMathSetting = { isRoot: command === '' };
+    this.baseMathSetting = { isRoot: command === '/' };
   }
 
   match(command: string): boolean {
