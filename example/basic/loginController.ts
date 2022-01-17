@@ -1,7 +1,7 @@
 import jsonFile from 'jsonfile';
 import path from 'path';
 
-import { Context, Terminal } from '../../cowmand';
+import { Context, Terminal } from '../../src/cowmand';
 
 const delay = (ms: number) =>
   new Promise(resolve => {

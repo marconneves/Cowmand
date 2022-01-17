@@ -1,4 +1,4 @@
-import Cowmand from '../../cowmand';
+import Cowmand from '../../src/cowmand';
 import { GuardLogin } from './guardLogin';
 import { LoginController } from './loginController';
 import { MeController } from './meController';

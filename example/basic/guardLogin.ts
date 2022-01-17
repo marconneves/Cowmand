@@ -1,6 +1,6 @@
 import jsonFile from 'jsonfile';
 import path from 'path';
-import { Context, Terminal, NextFunction } from '../../cowmand';
+import { Context, Terminal, NextFunction } from '../../src/cowmand';
 
 const GuardLogin = async (
   context: Context,
