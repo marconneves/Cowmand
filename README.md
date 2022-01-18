@@ -70,7 +70,7 @@ program.start();
 - [x] Validate errors Layers
 - [ ] Terminal - Add table console
 - [x] Terminal - Add question on terminal
-- [ ] Terminal - Add option to hide a password
+- [x] Terminal - Add option to hide a password
 
 ****
 This project is under the MIT license. See the [LICENSE][license-link] file for more details.

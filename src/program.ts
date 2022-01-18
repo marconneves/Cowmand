@@ -1,6 +1,6 @@
 import Debug from 'debug';
 
-import { terminal as terminalObject } from './terminal';
+import { terminal as terminalObject } from './Terminal';
 import {
   Layer,
   CommandFunction,
