@@ -64,6 +64,9 @@ program.command(['me'], GuardLogin, (context, terminal) => {
 program.start();
 ```
 
+## Docs
+  **Terminal** [Docs](/docs/Terminal.md)
+
 ## New Features
 
 - [ ] Commander Routes - Similar with Router of express, for use commands in other file.
