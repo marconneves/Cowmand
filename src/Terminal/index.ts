@@ -1,10 +1,13 @@
 import chalk from 'chalk';
 import ora from 'ora';
+import { ask, OptionsAsk } from './ask';
 
 interface Terminal {
   log(...args: unknown[]): Terminal;
   error(title: string, lines: string[]): Terminal;
   table(...args: unknown[]): Terminal;
+
+  ask(question: string, optionsAsk?: OptionsAsk): Promise<string>;
 
   loading(text: string): {
     changeText(textChange: string): void;
@@ -32,6 +35,7 @@ const terminal: Terminal = {
     console.table(...args);
     return this;
   },
+  ask,
   loading(text: string) {
     const spinner = ora({
       text: `${text}`

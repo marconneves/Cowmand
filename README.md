@@ -64,12 +64,16 @@ program.command(['me'], GuardLogin, (context, terminal) => {
 program.start();
 ```
 
+## Docs
+  **Terminal** [Docs](/docs/Terminal.md)
+
 ## New Features
 
 - [ ] Commander Routes - Similar with Router of express, for use commands in other file.
 - [x] Validate errors Layers
 - [ ] Terminal - Add table console
-- [ ] Terminal - Add question on terminal
+- [x] Terminal - Add question on terminal
+- [x] Terminal - Add option to hide a password
 
 ****
 This project is under the MIT license. See the [LICENSE][license-link] file for more details.

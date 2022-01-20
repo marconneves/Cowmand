@@ -1,5 +1,5 @@
 import Debug from 'debug';
-import { Terminal } from '../terminal';
+import { Terminal } from '../Terminal';
 
 const debug = Debug('cowmand:layer');
 const debugMatch = Debug('cowmand:layer:match');
