@@ -8,6 +8,8 @@ src/*
 test/*
 assets/*
 docs/*
+.idea/*
+example/*
 
 yarn.lock
 tsconfig.json
