@@ -59,8 +59,8 @@ const terminal: Terminal = {
       }
     };
   },
-  end() {
-    process.exit(0);
+  end(status = 0) {
+    process.exit(status);
   }
 };
 
