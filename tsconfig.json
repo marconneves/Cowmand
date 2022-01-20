@@ -13,7 +13,9 @@
   },
   "exclude": [
     "node_modules",
-    "example",
     "dist/**/*"
   ],
+  "include": [
+    "example/**/*"
+  ]
 }
