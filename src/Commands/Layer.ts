@@ -28,10 +28,10 @@ export type CommandFunction = (
 ) => void | Promise<void>;
 
 export type CommandErrorFunction = (
-  error: Error,
   context: Context,
   terminal: Terminal,
-  nextFunction: NextFunctionError
+  nextFunction: NextFunctionError,
+  error: Error
 ) => void;
 
 export interface OptionsLayer {
