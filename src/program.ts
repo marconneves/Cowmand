@@ -33,6 +33,8 @@ export interface Program {
     command: { notIn: string[] },
     ...fn: (CommandFunction | CommandErrorFunction)[]
   ): void;
+
+  command: any;
 }
 
 const program = { params: {} } as Program;

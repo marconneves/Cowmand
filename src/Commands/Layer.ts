@@ -12,6 +12,7 @@ export interface Params {
 
 export interface Context {
   params: Params;
+  arguments: { [key: string]: string };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   session: { [key: string]: any };
 }

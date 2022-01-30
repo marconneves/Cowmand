@@ -9,7 +9,7 @@ function createProgram() {
 }
 
 export { Context, NextFunction } from './Commands/Layer';
-export { Terminal } from './Terminal';
+export { Terminal } from './typing/Terminal';
 
 export { createProgram };
 export default createProgram;
