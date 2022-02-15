@@ -14,7 +14,7 @@ const ask = async function ask(
     let printAsk = false;
 
     const output = new Writable({
-      write(chunk, encoding, callback) {
+      write(chunk: Buffer, encoding, callback) {
         if (!printAsk) {
           printAsk = true;
           process.stdout.write(question);

@@ -85,10 +85,10 @@ program.start = function start(callback?: () => void) {
 
       if (error && layerStack.handleError) {
         layerStack.handleError(
-          error,
           { session: this.session, params: this.params },
           terminalObject,
-          next
+          next,
+          error
         );
       }
 
@@ -97,7 +97,6 @@ program.start = function start(callback?: () => void) {
         terminalObject,
         next
       );
-      // TODO: Use Layers of error to validate when has a error.
 
       return;
     }

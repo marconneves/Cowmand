@@ -9,11 +9,10 @@ export interface Params {
   subCommands: string[];
   flags: Map<string, string | number | boolean>;
 }
-
-export interface Context {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface Context<T = any> {
   params: Params;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  session: { [key: string]: any };
+  session: { [key: string]: T };
 }
 
 export type NextFunctionError = (error?: Error) => void;
