@@ -1,37 +1,38 @@
 import Debug from 'debug';
 
-import { terminal as terminalObject } from './Terminal';
 import {
-  Layer,
   CommandFunction,
   CommandErrorFunction,
   Params
 } from './Commands/Layer';
+import { IRoute, Router } from './Commands/Router';
 
 const debug = Debug('cowmand:program');
 
 export interface Program {
   session: { [key: string]: unknown };
   params: Params;
-  stack: Layer[];
+  routeBase?: IRoute;
 
   parseArguments(args: string[]): void;
   lazyStack(promises: Promise<unknown>[]): Generator<unknown, void>;
 
   init(): void;
 
-  start(): void;
-  start(callback: () => void): void;
+  start(callback?: () => void): void;
 
-  use(...fn: (CommandFunction | CommandErrorFunction)[]): void;
-  use(command: string, ...fn: (CommandFunction | CommandErrorFunction)[]): void;
+  use(...fn: (CommandFunction | CommandErrorFunction | IRoute)[]): void;
+  use(
+    command: string,
+    ...fn: (CommandFunction | CommandErrorFunction | IRoute)[]
+  ): void;
   use(
     commands: string[],
-    ...fn: (CommandFunction | CommandErrorFunction)[]
+    ...fn: (CommandFunction | CommandErrorFunction | IRoute)[]
   ): void;
   use(
     command: { notIn: string[] },
-    ...fn: (CommandFunction | CommandErrorFunction)[]
+    ...fn: (CommandFunction | CommandErrorFunction | IRoute)[]
   ): void;
 }
 
@@ -46,7 +47,6 @@ program.init = function init() {
     subCommands: [] as string[],
     flags: new Map<string, string | number | boolean>()
   };
-  this.stack = [] as Layer[];
 
   this.parseArguments(process.argv);
 
@@ -57,91 +57,20 @@ program.init = function init() {
  * TODO: The stack is wrong, need refactor after.ß
  */
 
-program.start = function start(callback?: () => void) {
-  let index = 0;
+program.start = function start(callback) {
   if (callback) callback();
 
-  const next = (error?: Error) => {
-    if (error) console.log(error);
-
-    if (index >= this.stack.length) return;
-
-    let layerStack;
-    let match;
-
-    while (match !== true && index < this.stack.length) {
-      layerStack = this.stack[index];
-      match = layerStack.match(this.params.command);
-
-      index++;
-
-      if (!match) {
-        continue;
-      }
-
-      if (error && !layerStack.handleError) {
-        continue;
-      }
-
-      if (error && layerStack.handleError) {
-        layerStack.handleError(
-          { session: this.session, params: this.params },
-          terminalObject,
-          next,
-          error
-        );
-      }
-
-      layerStack.handle(
-        { session: this.session, params: this.params },
-        terminalObject,
-        next
-      );
-
-      return;
-    }
-  };
-
-  next();
+  program.routeBase?.start(this.session, this.params);
 };
 
-program.use = function use(firstArgument) {
-  let offset = 0;
-  let command = '/';
-  let subCommands = [] as string[];
-  let notInCommands = [] as string[];
-
-  if (typeof firstArgument !== 'function') {
-    offset = 1;
-
-    if (typeof firstArgument === 'string') {
-      command = firstArgument;
-    } else if (Array.isArray(firstArgument)) {
-      const [commands, ...rest] = firstArgument as string[];
-
-      command = commands;
-      subCommands = rest;
-    } else {
-      notInCommands = firstArgument.notIn;
-    }
+program.use = function use() {
+  if (!this.routeBase) {
+    this.routeBase = Router();
+    debug('create route base');
   }
 
-  const callbacks = (
-    Object.values(arguments) as unknown as (
-      | CommandFunction
-      | CommandErrorFunction
-    )[]
-  ).slice(offset);
-
-  for (let i = 0; i < callbacks.length; i++) {
-    const callback = callbacks[i];
-
-    debug("use middleware %s on '%s'", callback.name, command);
-
-    this.stack.push(
-      new Layer(command, { subCommands, notInCommands }, callback)
-    );
-  }
+  debug('use in route base');
+  this.routeBase.use(...arguments);
 };
 
 program.parseArguments = function parseArguments(args: string[]) {

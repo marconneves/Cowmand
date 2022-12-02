@@ -9,6 +9,7 @@ function createProgram() {
 
 export { Context, NextFunction } from './Commands/Layer';
 export { Terminal } from './Terminal';
+export { Router } from './Commands/Router';
 
 export { createProgram };
 export default createProgram;

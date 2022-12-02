@@ -1,8 +1,6 @@
 import { Context, Terminal } from '../../src/cowmand';
 
 const MeController = async (context: Context, terminal: Terminal) => {
-
-  terminal.error('Error on Login', ['Novo error', 'agora vai']);
   terminal.table([
     {
       name: "Marcon",

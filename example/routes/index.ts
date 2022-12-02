@@ -2,16 +2,12 @@ import Cowmand from '../../src/cowmand';
 // @ts-ignore
 import { GuardLogin } from './guardLogin';
 // @ts-ignore
-import { LoginController } from './loginController';
-// @ts-ignore
-import { MeController } from './meController';
+import { Route } from './routes';
 
 const program = Cowmand();
 
 program.use({ notIn: ['login'] }, GuardLogin);
 
-program.use('login', LoginController);
-
-program.use('me', MeController);
+program.use(Route);
 
 program.start();

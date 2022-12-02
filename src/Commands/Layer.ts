@@ -1,11 +1,12 @@
 import Debug from 'debug';
 import { Terminal } from '../Terminal';
+import { IRoute } from './Router';
 
 const debug = Debug('cowmand:layer');
 const debugMatch = Debug('cowmand:layer:match');
 
 export interface Params {
-  command: string;
+  command?: string;
   subCommands: string[];
   flags: Map<string, string | number | boolean>;
 }
@@ -36,6 +37,7 @@ export type CommandErrorFunction = (
 export interface OptionsLayer {
   subCommands: string[];
   notInCommands: string[];
+  isRouter?: boolean;
 }
 
 export interface ILayer {
@@ -63,10 +65,15 @@ class Layer implements ILayer {
 
   private baseMathSetting: { isRoot: boolean };
 
+  public isRouter: boolean;
+
+  public route?: IRoute;
+
   constructor(
     command: string | undefined,
     options: OptionsLayer,
-    executor: CommandFunction | CommandErrorFunction
+    executor: CommandFunction | CommandErrorFunction,
+    route?: IRoute
   ) {
     if (executor.length <= 3) {
       this.handle = executor as unknown as CommandFunction;
@@ -74,10 +81,14 @@ class Layer implements ILayer {
     if (executor.length > 3) {
       this.handleError = executor as unknown as CommandErrorFunction;
     }
+    if (route) {
+      this.route = route;
+    }
 
     this.name = executor.name || 'anonymous';
     this.command = command || '/';
     this.notInCommand = options.notInCommands || [];
+    this.isRouter = options.isRouter || false;
 
     debug('new %s:%s', this.name, command);
 
