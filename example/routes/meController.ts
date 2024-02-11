@@ -8,7 +8,7 @@ const MeController = async (context: Context, terminal: Terminal) => {
       from: "Brazil"
     },
     {
-      name: "Julia",
+      name: "Mari",
       age: 21,
       from: "Italy"
     }
