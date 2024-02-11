@@ -1,6 +1,6 @@
 {
   "name": "cowmand",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Fast helper to create a cli",
   "tags": [
     "cli",
@@ -14,7 +14,7 @@
   "typings": "dist/cowmand.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MarconWillian/Cowmand"
+    "url": "https://github.com/MarconNeves/Cowmand"
   },
   "author": "Marcon Willian <oi@marcon.run>",
   "license": "MIT",

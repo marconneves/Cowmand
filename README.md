@@ -69,7 +69,7 @@ program.start();
 
 ## New Features
 
-- [ ] Commander Routes - Similar with Router of express, for use commands in other file.
+- [x] Commander Routes - Similar with Router of express, for use commands in other file.
 - [x] Validate errors Layers
 - [ ] Terminal - Add table console
 - [x] Terminal - Add question on terminal
