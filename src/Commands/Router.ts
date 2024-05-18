@@ -105,12 +105,12 @@ proto.start = function start(
 
     if (index >= this.stack.length) return;
 
-    let layerStack;
+    let layerStack: Layer;
     let match;
 
     while (match !== true && index < this.stack.length) {
       layerStack = this.stack[index];
-      match = layerStack.match(this.params.command);
+      match = layerStack.match(this.params.command || '');
 
       index++;
 
@@ -132,7 +132,7 @@ proto.start = function start(
           flags: params.flags
         } as Params;
 
-        layerStack.route.start(this.session, internalParams);
+        layerStack.route?.start(this.session, internalParams);
       }
 
       if (error && layerStack.handleError) {
@@ -144,11 +144,12 @@ proto.start = function start(
         );
       }
 
-      layerStack.handle(
-        { session: this.session, params: this.params },
-        terminalObject,
-        next
-      );
+      if (layerStack.handle)
+        layerStack.handle(
+          { session: this.session, params: this.params },
+          terminalObject,
+          next
+        );
 
       return;
     }

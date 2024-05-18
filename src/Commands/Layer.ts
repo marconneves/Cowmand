@@ -59,11 +59,11 @@ class Layer implements ILayer {
 
   public handleError?: CommandErrorFunction;
 
-  private command: string;
+  public command: string;
 
-  private notInCommand: string[];
+  public notInCommand: string[];
 
-  private baseMathSetting: { isRoot: boolean };
+  public baseMathSetting: { isRoot: boolean };
 
   public isRouter: boolean;
 
