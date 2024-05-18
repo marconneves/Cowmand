@@ -1,7 +1,7 @@
 import jsonFile from 'jsonfile';
 import path from 'path';
 
-import { Context, Terminal } from '../../src/cowmand';
+import { Context, Terminal } from '../../../src/cowmand';
 
 const delay = (ms: number) =>
   new Promise(resolve => {
@@ -10,13 +10,13 @@ const delay = (ms: number) =>
 
 const LoginController = async (context: Context, terminal: Terminal) => {
   let user = context.params.flags.get('--user');
-  if(!user){
-    user = await terminal.ask("Username: ")
+  if (!user) {
+    user = await terminal.ask('Username: ');
   }
 
   let password = context.params.flags.get('--password');
-  if(!password){
-    password = await terminal.ask("Password: ", {hidden: true})
+  if (!password) {
+    password = await terminal.ask('Password: ', { hidden: true });
   }
 
   const loading = terminal.loading('Logging in...');
@@ -26,6 +26,10 @@ const LoginController = async (context: Context, terminal: Terminal) => {
     loading.fail('Error in crate a login. Password or user is incorrect.');
     return terminal.end();
   }
+
+  await delay(3000);
+
+  loading.changeColor(ora.Color);
 
   jsonFile.writeFileSync(path.resolve(__dirname, 'session.json'), {
     user: { name: 'Marcon Willian' }

@@ -1,16 +1,16 @@
-import { Context, Terminal } from '../../src/cowmand';
+import { Context, Terminal } from '../../../src/cowmand';
 
 const MeController = async (context: Context, terminal: Terminal) => {
   terminal.table([
     {
-      name: "Marcon",
+      name: 'Marcon',
       age: 23,
-      from: "Brazil"
+      from: 'Brazil'
     },
     {
-      name: "Mari",
+      name: 'Mari',
       age: 21,
-      from: "Italy"
+      from: 'Italy'
     }
   ]);
 
