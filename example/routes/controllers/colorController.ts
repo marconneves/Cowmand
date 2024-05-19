@@ -1,30 +1,30 @@
 import { Context, Terminal } from '../../../src/cowmand';
 
 const ColorController = async (_: Context, terminal: Terminal) => {
-  terminal.log('OK');
-
-  const answer = await terminal.select('Qual cor voce prefere?', [
-    {
-      title: '🩵 Azul',
-      value: 'blue',
-      key: 'r',
-      selected: false
-    },
-    {
-      title: '🧡 Laranja',
-      value: 'orange',
-      key: 'o',
-      selected: false
-    },
-    {
-      title: '💚 Verde',
-      value: 'green',
-      key: 'g',
-      selected: false
+  const answer = await terminal.select(
+    'What is the best color?',
+    [
+      {
+        title: 'Blue',
+        value: 'blue',
+        selected: false
+      },
+      {
+        title: 'Orange',
+        value: 'orange',
+        selected: false
+      },
+      {
+        title: 'Green',
+        value: 'green',
+        selected: false
+      }
+    ],{
+      isMultiple: false
     }
-  ]);
+  );
 
-  return terminal.log(`Color ${answer}`).end();
+  return terminal.end();
 };
 
 export { ColorController };

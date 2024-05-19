@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import ora from 'ora';
 import { ask, OptionsAsk } from './ask';
-import { select, OptionsSelect } from './select';
+import { select, ItemSelect, OptionsSelect } from './select';
 
 interface Terminal {
   log(...args: unknown[]): Terminal;
@@ -9,7 +9,11 @@ interface Terminal {
   table(...args: unknown[]): Terminal;
 
   ask(question: string, optionsAsk?: OptionsAsk): Promise<string>;
-  select(question: string, options: OptionsSelect[]): Promise<string[]>;
+  select(
+    question: string,
+    items: ItemSelect[],
+    options?: OptionsSelect
+  ): Promise<string[] | string>;
 
   loading(text: string): {
     changeText(textChange: string): void;

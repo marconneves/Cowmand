@@ -5,15 +5,31 @@ export interface OptionsAsk {
   hidden: boolean;
 }
 
-const ask = async function ask(
-  question: string,
-  optionsAsk?: OptionsAsk
-): Promise<string> {
-  return new Promise(resolve => {
-    let muted = false;
+class Ask {
+  async execute(
+    questionInput: string,
+    optionsAsk?: OptionsAsk
+  ): Promise<string> {
+    const question = this.trimAndAddSpace(questionInput);
+
+    return new Promise(resolve => {
+      const questionInterface = createInterface({
+        input: process.stdin,
+        output: this.output(question, optionsAsk?.hidden),
+        terminal: true
+      });
+
+      questionInterface.question(question, answer => {
+        questionInterface.close();
+        resolve(answer);
+      });
+    });
+  }
+
+  private output(question: string, muted = false) {
     let printAsk = false;
 
-    const output = new Writable({
+    return new Writable({
       write(chunk: Buffer, encoding, callback) {
         if (!printAsk) {
           printAsk = true;
@@ -32,20 +48,11 @@ const ask = async function ask(
         callback();
       }
     });
+  }
 
-    const questionInterface = createInterface({
-      input: process.stdin,
-      output,
-      terminal: true
-    });
+  private trimAndAddSpace(value: string): string {
+    return `${value.trim()} `;
+  }
+}
 
-    muted = optionsAsk?.hidden || false;
-
-    questionInterface.question(question, answer => {
-      questionInterface.close();
-      resolve(answer);
-    });
-  });
-};
-
-export { ask };
+export const ask = new Ask().execute;

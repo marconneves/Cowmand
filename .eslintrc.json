@@ -1,46 +1,46 @@
 {
-    "env": {
-        "es6": true,
-        "node": true
-    },
-    "extends": [
-        "airbnb-base",
-        "plugin:@typescript-eslint/recommended",
-        "prettier",
-        "plugin:prettier/recommended"
-    ],
-    "globals": {
-        "Atomics": "readonly",
-        "SharedArrayBuffer": "readonly"
-    },
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-        "ecmaVersion": 2018,
-        "sourceType": "module"
-    },
-    "plugins": [
-        "prettier",
-        "@typescript-eslint"
-    ],
-    "rules": {
-        "prettier/prettier": "error",
-        "import/extensions": [
-            "error",
-            "ignorePackages",
-            {
-            "ts": "never"
-            }
-        ],
-        "import/prefer-default-export": "off",
-        "no-param-reassign": "off",
-        "no-console": "off",
-        "no-plusplus": "off",
-        "no-continue": "off",
-        "prefer-rest-params": "off"
-    },
-    "settings": {
-      "import/resolver": {
-        "typescript": {}
+  "env": {
+    "es6": true,
+    "node": true
+  },
+  "extends": [
+    "airbnb-base",
+    "plugin:@typescript-eslint/recommended",
+    "prettier",
+    "plugin:prettier/recommended"
+  ],
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly"
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module"
+  },
+  "plugins": ["prettier", "@typescript-eslint"],
+  "rules": {
+    "prettier/prettier": "error",
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "ts": "never"
       }
+    ],
+    "import/prefer-default-export": "off",
+    "no-param-reassign": "off",
+    "no-console": "off",
+    "no-plusplus": "off",
+    "no-continue": "off",
+    "prefer-rest-params": "off",
+    "class-methods-use-this": "off",
+    "no-shadow": "off",
+    "@typescript-eslint/no-shadow": ["error"]
+  },
+  "settings": {
+    "import/resolver": {
+      "typescript": {}
     }
+  }
 }

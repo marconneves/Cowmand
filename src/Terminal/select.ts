@@ -1,26 +1,37 @@
 import { createInterface, moveCursor, clearScreenDown } from 'readline';
 import { stdin, stdout } from 'process';
 import { Writable } from 'stream';
+import chalk from 'chalk';
 
 export interface OptionsSelect {
+  isMultiple: boolean;
+}
+
+export interface ItemMultipleSelect {
   title: string;
   value: string;
-  key?: string;
   selected?: boolean;
 }
 
-enum KeysEnum {
+export interface ItemSingleSelect {
+  title: string;
+  value: string;
+}
+
+export type ItemSelect = ItemMultipleSelect | ItemSingleSelect;
+
+export enum KeysEnum {
   CTRL_C = '\u0003',
   UP_ARROW = '\u001B\u005B\u0041',
   DOWN_ARROW = '\u001B\u005B\u0042',
   SPACE = ' ',
   ENTER = '\r',
-  X = 'X'
+  X = 'x'
 }
 
-const select = async function select(
+const selectMultiple = async function selectMultiple(
   question: string,
-  options: OptionsSelect[]
+  items: ItemMultipleSelect[]
 ): Promise<string[]> {
   return new Promise(resolve => {
     const output = new Writable({
@@ -37,52 +48,52 @@ const select = async function select(
 
     let selectedIndex = 0;
 
-    const renderOptions = () => {
+    const renderItems = () => {
       console.log(question);
-      options.forEach((option, index) => {
-        const isSelected = option.selected ? 'x' : ' ';
+      items.forEach((item, index) => {
+        const isSelected = item.selected ? 'x' : ' ';
         const isCurrent = index === selectedIndex ? '>' : ' ';
-        console.log(`${isCurrent} [${isSelected}] ${option.title}`);
+        console.log(`${isCurrent} [${isSelected}] ${item.title}`);
       });
     };
 
-    renderOptions();
+    renderItems();
 
     const cleanTerminal = () => {
-      moveCursor(stdout, 0, -options.length - 1);
+      moveCursor(stdout, 0, -items.length - 1);
       clearScreenDown(stdout);
     };
 
-    const reRenderOptions = () => {
+    const reRenderItems = () => {
       cleanTerminal();
-      renderOptions();
+      renderItems();
     };
 
     stdin.setRawMode(true);
     stdin.resume();
     stdin.setEncoding('utf8');
 
-    const handleKeyPress = key => {
+    const handleKeyPress = (key: string) => {
       if (key === KeysEnum.CTRL_C) {
         resolve([]);
       } else if (key === KeysEnum.UP_ARROW) {
         if (selectedIndex > 0) {
           selectedIndex--;
-          reRenderOptions();
+          reRenderItems();
         }
       } else if (key === KeysEnum.DOWN_ARROW) {
-        if (selectedIndex < options.length - 1) {
+        if (selectedIndex < items.length - 1) {
           selectedIndex++;
-          reRenderOptions();
+          reRenderItems();
         }
-      } else if (key === KeysEnum.SPACE || key === KeysEnum.X) {
-        options[selectedIndex].selected = !options[selectedIndex].selected;
-        reRenderOptions();
+      } else if (key === KeysEnum.SPACE || key.toLowerCase() === KeysEnum.X) {
+        items[selectedIndex].selected = !items[selectedIndex].selected;
+        reRenderItems();
       } else if (key === KeysEnum.ENTER) {
         readline.close();
         stdin.setRawMode(false);
         resolve(
-          options.filter(option => option.selected).map(option => option.value)
+          items.filter(option => option.selected).map(option => option.value)
         );
       }
     };
@@ -95,6 +106,107 @@ const select = async function select(
       stdin.pause();
     });
   });
+};
+
+const selectSingle = async function selectSingle(
+  question: string,
+  items: ItemSingleSelect[]
+): Promise<string> {
+  return new Promise(resolve => {
+    const output = new Writable({
+      write(chunk: Buffer, encoding, callback) {
+        callback();
+      }
+    });
+
+    const readline = createInterface({
+      input: stdin,
+      output,
+      terminal: true
+    });
+
+    let selectedIndex = 0;
+
+    const renderItems = () => {
+      console.log(question);
+      items.forEach((option, index) => {
+        const isCurrent = index === selectedIndex;
+
+        if (isCurrent) {
+          console.log(`>`, chalk.cyanBright(option.title));
+        } else {
+          console.log(`  ${option.title}`);
+        }
+      });
+    };
+
+    renderItems();
+
+    const cleanTerminal = () => {
+      moveCursor(stdout, 0, -items.length - 1);
+      clearScreenDown(stdout);
+    };
+
+    const reRenderItems = () => {
+      cleanTerminal();
+      renderItems();
+    };
+
+    const renderAwesome = (item: string) => {
+      cleanTerminal();
+      console.log(question, chalk.cyanBright(item));
+    };
+
+    stdin.setRawMode(true);
+    stdin.resume();
+    stdin.setEncoding('utf8');
+
+    const handleKeyPress = (key: string) => {
+      if (key === KeysEnum.CTRL_C) {
+        resolve('');
+      } else if (key === KeysEnum.UP_ARROW) {
+        if (selectedIndex > 0) {
+          selectedIndex--;
+          reRenderItems();
+        }
+      } else if (key === KeysEnum.DOWN_ARROW) {
+        if (selectedIndex < items.length - 1) {
+          selectedIndex++;
+          reRenderItems();
+        }
+      } else if (
+        [KeysEnum.SPACE, KeysEnum.ENTER].includes(key as KeysEnum) ||
+        key.toLowerCase() === KeysEnum.X
+      ) {
+        readline.close();
+        stdin.setRawMode(false);
+        const selected = items[selectedIndex];
+
+        renderAwesome(selected.title);
+        resolve(selected.value);
+      }
+    };
+
+    stdin.on('data', handleKeyPress);
+
+    readline.on('close', () => {
+      stdin.removeListener('data', handleKeyPress);
+      stdin.setRawMode(false);
+      stdin.pause();
+    });
+  });
+};
+
+const select = async function select(
+  question: string,
+  items: ItemSelect[],
+  options?: OptionsSelect
+): Promise<string[] | string> {
+  if (options?.isMultiple) {
+    return selectMultiple(question, items as ItemMultipleSelect[]);
+  }
+
+  return selectSingle(question, items as ItemSingleSelect[]);
 };
 
 export { select };

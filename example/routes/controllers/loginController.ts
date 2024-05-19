@@ -29,8 +29,6 @@ const LoginController = async (context: Context, terminal: Terminal) => {
 
   await delay(3000);
 
-  loading.changeColor(ora.Color);
-
   jsonFile.writeFileSync(path.resolve(__dirname, 'session.json'), {
     user: { name: 'Marcon Willian' }
   });
