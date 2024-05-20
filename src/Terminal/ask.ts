@@ -5,17 +5,17 @@ export interface OptionsAsk {
   hidden: boolean;
 }
 
-class Ask {
+const AskProto = {
   async execute(
     questionInput: string,
     optionsAsk?: OptionsAsk
   ): Promise<string> {
-    const question = this.trimAndAddSpace(questionInput);
+    const question = AskProto.trimAndAddSpace(questionInput);
 
     return new Promise(resolve => {
       const questionInterface = createInterface({
         input: process.stdin,
-        output: this.output(question, optionsAsk?.hidden),
+        output: AskProto.output(question, optionsAsk?.hidden),
         terminal: true
       });
 
@@ -24,9 +24,9 @@ class Ask {
         resolve(answer);
       });
     });
-  }
+  },
 
-  private output(question: string, muted = false) {
+  output(question: string, muted = false) {
     let printAsk = false;
 
     return new Writable({
@@ -48,11 +48,11 @@ class Ask {
         callback();
       }
     });
-  }
+  },
 
-  private trimAndAddSpace(value: string): string {
+  trimAndAddSpace(value: string): string {
     return `${value.trim()} `;
   }
-}
+};
 
-export const ask = new Ask().execute;
+export const ask = AskProto.execute;
