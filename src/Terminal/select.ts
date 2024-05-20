@@ -29,6 +29,11 @@ export enum KeysEnum {
   X = 'x'
 }
 
+const cleanTerminal = (columnBack: number, linedBack: number) => {
+  moveCursor(stdout, columnBack, -linedBack);
+  clearScreenDown(stdout);
+};
+
 const selectMultiple = async function selectMultiple(
   question: string,
   items: ItemMultipleSelect[]
@@ -59,14 +64,14 @@ const selectMultiple = async function selectMultiple(
 
     renderItems();
 
-    const cleanTerminal = () => {
-      moveCursor(stdout, 0, -items.length - 1);
-      clearScreenDown(stdout);
+    const reRenderItems = () => {
+      cleanTerminal(0, items.length + 1);
+      renderItems();
     };
 
-    const reRenderItems = () => {
-      cleanTerminal();
-      renderItems();
+    const renderAwesome = (item: string) => {
+      cleanTerminal(0, items.length + 1);
+      console.log(question, chalk.cyanBright(item));
     };
 
     stdin.setRawMode(true);
@@ -92,9 +97,10 @@ const selectMultiple = async function selectMultiple(
       } else if (key === KeysEnum.ENTER) {
         readline.close();
         stdin.setRawMode(false);
-        resolve(
-          items.filter(option => option.selected).map(option => option.value)
-        );
+        const selected = items.filter(option => option.selected);
+
+        renderAwesome(selected.map(option => option.title).join(', '));
+        resolve(selected.map(option => option.value));
       }
     };
 
@@ -142,18 +148,13 @@ const selectSingle = async function selectSingle(
 
     renderItems();
 
-    const cleanTerminal = () => {
-      moveCursor(stdout, 0, -items.length - 1);
-      clearScreenDown(stdout);
-    };
-
     const reRenderItems = () => {
-      cleanTerminal();
+      cleanTerminal(0, items.length + 1);
       renderItems();
     };
 
     const renderAwesome = (item: string) => {
-      cleanTerminal();
+      cleanTerminal(0, items.length + 1);
       console.log(question, chalk.cyanBright(item));
     };
 

@@ -7,6 +7,31 @@ const ColorController = async (_: Context, terminal: Terminal) => {
       {
         title: 'Blue',
         value: 'blue',
+      },
+      {
+        title: 'Orange',
+        value: 'orange',
+      },
+      {
+        title: 'Green',
+        value: 'green',
+      }
+    ],{
+      isMultiple: false
+    }
+  );
+
+  return terminal.end();
+};
+
+
+const ColorMultipleController = async (_: Context, terminal: Terminal) => {
+  const answer = await terminal.select(
+    'What is the best color?',
+    [
+      {
+        title: 'Blue',
+        value: 'blue',
         selected: false
       },
       {
@@ -20,11 +45,11 @@ const ColorController = async (_: Context, terminal: Terminal) => {
         selected: false
       }
     ],{
-      isMultiple: false
+      isMultiple: true
     }
   );
 
   return terminal.end();
 };
 
-export { ColorController };
+export { ColorController, ColorMultipleController};
