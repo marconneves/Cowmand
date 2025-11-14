@@ -1,6 +1,6 @@
 import Debug from 'debug';
-import { Terminal } from '../Terminal';
-import { IRoute } from './Router';
+import { Terminal } from '../Terminal/index.js';
+import { IRoute } from './Router.js';
 
 const debug = Debug('cowmand:layer');
 const debugMatch = Debug('cowmand:layer:match');

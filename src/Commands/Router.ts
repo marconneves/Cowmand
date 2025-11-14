@@ -1,6 +1,6 @@
 import Debug from 'debug';
-import { CommandErrorFunction, CommandFunction, Layer, Params } from './Layer';
-import { terminal as terminalObject } from '../Terminal';
+import { CommandErrorFunction, CommandFunction, Layer, Params } from './Layer.js';
+import { terminal as terminalObject } from '../Terminal/index.js';
 
 const debug = Debug('cowmand:Router');
 

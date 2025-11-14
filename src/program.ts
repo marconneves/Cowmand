@@ -4,8 +4,8 @@ import {
   CommandFunction,
   CommandErrorFunction,
   Params
-} from './Commands/Layer';
-import { IRoute, Router } from './Commands/Router';
+} from './Commands/Layer.js';
+import { IRoute, Router } from './Commands/Router.js';
 
 const debug = Debug('cowmand:program');
 
