@@ -30,17 +30,16 @@ Using middleware in global, but with rules to notIn `["login"]`.
 ```typescript
 import Cowmand from 'cowmand';
 import { GuardLogin } from './guardLogin';
-import { Login } from './login';
+import { LoginController } from './loginController';
+import { MeController } from './meController';
 
 const program = Cowmand();
 
 program.use({ notIn: ['login'] }, GuardLogin);
 
-program.command(['login'], Login);
+program.use('login', LoginController);
 
-program.command(['me'], (context, terminal) => {
-  terminal.log(`Hello, ${context.session.user?.name}!`).end();
-});
+program.use('me', MeController);
 
 program.start();
 ```
@@ -50,15 +49,57 @@ Using middleware before command handle:
 ```typescript
 import Cowmand from 'cowmand';
 import { GuardLogin } from './guardLogin';
-import { Login } from './login';
+import { LoginController } from './loginController';
+import { MeController } from './meController';
 
 const program = Cowmand();
 
-program.command(['login'], Login);
+program.use('login', LoginController);
 
-program.command(['me'], GuardLogin, (context, terminal) => {
-  terminal.log(`Hello, ${context.session.user?.name}!`).end();
-});
+program.use('me', GuardLogin, MeController);
+
+program.start();
+```
+
+## Router
+
+You can also use the `Router` to organize your commands in different files.
+
+`routes/index.ts`
+```typescript
+import { Router } from "cowmand";
+import { LoginController } from "./../loginController";
+import { Dash } from "./dash.routes";
+
+const Route = Router();
+Route.use('login', LoginController);
+
+Route.use('dash', Dash)
+export { Route }
+```
+
+`routes/dash.routes.ts`
+```typescript
+import { Router } from "cowmand";
+import { MeController } from "./../meController";
+
+const Dash = Router();
+Dash.use('me', MeController);
+
+export { Dash }
+```
+
+And in your main file `index.ts`:
+```typescript
+import Cowmand from 'cowmand';
+import { GuardLogin } from './guardLogin';
+import { Route } from './routes';
+
+const program = Cowmand();
+
+program.use({ notIn: ['login'] }, GuardLogin);
+
+program.use(Route);
 
 program.start();
 ```
