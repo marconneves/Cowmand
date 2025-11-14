@@ -1,6 +1,6 @@
 import chalk from 'chalk';
-import ora, { Color } from 'ora';
-import { ask, OptionsAsk } from './ask.js';
+import ora from 'ora';
+import { ask, OptionsAsk } from './ask';
 
 interface Terminal {
   log(...args: unknown[]): Terminal;
@@ -12,7 +12,7 @@ interface Terminal {
   loading(text: string): {
     changeText(textChange: string): void;
     stop(): void;
-    changeColor(color: Color): void;
+    changeColor(color: ora.Color): void;
     succeed(textSuccess: string): void;
     fail(textFail: string): void;
   };
@@ -42,7 +42,7 @@ const terminal: Terminal = {
     }).start();
 
     return {
-      changeColor(color: Color) {
+      changeColor(color: ora.Color) {
         spinner.color = color;
       },
       changeText(textChange: string) {
@@ -64,5 +64,4 @@ const terminal: Terminal = {
   }
 };
 
-export { terminal };
-export type { Terminal };
+export { terminal, Terminal };

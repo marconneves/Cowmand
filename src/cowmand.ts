@@ -1,4 +1,4 @@
-import proto from './program.js';
+import proto from './program';
 
 function createProgram() {
   const program = proto;
@@ -7,9 +7,9 @@ function createProgram() {
   return program;
 }
 
-export type { Context, NextFunction } from './Commands/Layer.js';
-export type { Terminal } from './Terminal/index.js';
-export { Router } from './Commands/Router.js';
+export { Context, NextFunction } from './Commands/Layer';
+export { Terminal } from './Terminal';
+export { Router } from './Commands/Router';
 
 export { createProgram };
 export default createProgram;

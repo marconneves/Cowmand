@@ -1,0 +1,41 @@
+name: Test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '18.x'
+
+    - run: npm ci
+
+    - name: run jest
+      run: npx jest --ci --reporters=default --reporters=jest-junit
+
+    - name: Jest Report
+      uses: dorny/test-reporter@v1
+      id: test-report
+      if: success() || failure()
+      with:
+        name: Jest Report
+        path: reports/jest.xml
+        reporter: jest-junit
+
+    - name: Post Test Summary
+      if: github.event_name == 'pull_request' && steps.test-report.outputs.summary != ''
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        SUMMARY: ${{ steps.test-report.outputs.summary }}
+      run: |
+        gh pr comment $PR_NUMBER --body "$SUMMARY"
