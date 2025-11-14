@@ -9,7 +9,8 @@
     "outDir": "dist",
     "rootDir": "src",
     "declaration": true,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "types": ["jest", "node"]
   },
   "exclude": [
     "node_modules",
